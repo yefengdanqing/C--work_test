@@ -1,1 +1,76 @@
 
+#include "MyString.h"
+char* MyString::alloc_n_copy(const char* s)//分配空间？？
+{
+	m_data=alloc.allocate(strlen(s)+1);
+	char *p=m_data;
+	int i=0;
+	while(s[i]!='\0')
+	{
+		alloc.construct(p++,s[i++]);
+	}
+	alloc.construct(p,s[i]);
+	return m_data;
+}
+void MyString::free()//
+{
+	char* p=m_data;
+	size_t num=strlen(p)+1;
+	while (*p!='\0')
+	{
+		alloc.destroy(p++);
+	}
+	alloc.destroy(p);
+	alloc.deallocate(m_data,num);
+}
+MyString::MyString(char* s)
+{
+	std::cout<<"构造函数"<<std::endl;
+	if (s==nullptr)
+	{
+		m_data=new char[1];
+		*m_data='\0';
+	} 
+	else
+	{
+		//m_data=alloc_n_copy(s);
+		int num=strlen(s);
+		m_data=new char[num+1];
+		strcpy(m_data,s);
+		std::cout<<*m_data<<std::endl;
+	}
+}
+MyString::MyString(const MyString& str)//注意验证是否为空
+{
+	//不明白这个函数是啥意思
+	//m_data=alloc_n_copy(str.m_data);
+	if (str.m_data==nullptr)
+	{
+		delete m_data;
+	}
+	int len=strlen(str.m_data);
+	m_data=new char[len+1];
+	strcpy(m_data,str.m_data);
+}
+size_t MyString::sizeStr()
+{
+	return strlen(m_data);
+}
+MyString& MyString::operator=(const MyString& obj)
+{
+	//处理自复制
+	if (this==&obj)//this 到底是什么类型
+	{
+		return *this;//this 是一个右值？？
+	}
+	if (m_data!=nullptr)
+	{
+		delete m_data;
+		m_data=nullptr;
+	}
+	int length=strlen(obj.m_data);
+	m_data=new char[length+1];
+	memset(m_data,0,sizeof(length+1));//格式化字节
+	strcpy(m_data,obj.m_data);
+	return *this;//因为返回MyString&，return *this
+}
