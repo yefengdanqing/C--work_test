@@ -1,0 +1,46 @@
+/*class MyString
+{
+//friend std::istream operator>> (std::istream&,MyString&);
+//friend std::ostream operator<<(std::ostream&,MyString&);
+public:
+	MyString(const char*);//普通构造函数
+	MyString(const MyString&);// 拷贝构造函数
+	~MyString();//析构函数
+	MyString& operator =(const MyString&);//等号运算符
+	size_t sizeStr() const;//求长度
+	void swapString(MyString& rhs);
+private:
+	char* m_data;  //用于保存字符串
+};*/
+//std::istream operator>> (istream&,const MyString&);
+//std::ostream operator<< (std::ostream&,MyString&);
+#ifndef MYSTRING_H
+#define MYSTRING_H
+#include <iostream>
+class MyString
+{
+	friend std::ostream& operator<<(std::ostream&,const MyString&);//不用处理可能出错的情况
+	friend std::istream& operator>>(std::istream&,MyString&);//必须处理可能出错的情况
+
+	friend bool operator<(const MyString&,const MyString&);
+	friend bool operator==(const MyString&,const MyString&);
+	friend bool operator!=(const MyString&,const MyString&);
+	friend MyString& operator+(const MyString&,const MyString&);
+public:
+	MyString();
+	MyString(char*);
+	MyString(const MyString&);//常量，拷贝构造函数
+	MyString& operator= (const MyString&);//赋值运算符
+	char& operator[](MyString&);//定义两个版本
+	const char& operator[](const MyString&);//重载下标运算符
+	MyString& operator++();//前置版本,由于是成员函数，只有一个参数，函数中没有参数
+	MyString operator++(int);//后置版本,假如返回引用则是递增之后的值，而后置返回的是原值。需要记录原值
+	MyString& operator--();//前置版本在递增前要判断是否到达末尾，递减要判断是否出界
+	MyString operator--(int);//后置调用前置版本
+	size_t sizeStr();//求解string的长度
+	MyString& operator+=(const MyString&);//可能没有用
+	MyString& operator-=(const MyString&);
+	~MyString();
+private:
+};
+#endif
