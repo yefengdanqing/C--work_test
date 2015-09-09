@@ -1,5 +1,6 @@
+#include "stdafx.h"
 #include "MyString.h"
-char* MyString::alloc_n_copy(const char* s)//分配空间？？
+/*char* MyString::alloc_n_copy(const char* s)//分配空间？？
 {
 	m_data=alloc.allocate(strlen(s)+1);
 	char *p=m_data;
@@ -21,6 +22,12 @@ void MyString::free()//
 	}
 	alloc.destroy(p);
 	alloc.deallocate(m_data,num);
+}*/
+MyString::MyString()
+{
+	strLength=0;
+	m_data=new char[1];
+	m_data='\0';
 }
 MyString::MyString(char* s)
 {
@@ -36,8 +43,57 @@ MyString::MyString(char* s)
 		int num=strlen(s);
 		m_data=new char[num+1];
 		strcpy(m_data,s);
-		std::cout<<*m_data<<std::endl;
+		std::cout<<m_data<<std::endl;
 	}
+}
+MyString::MyString(char ch,int n)
+{
+	int length2=strlen(m_data);
+	m_data=new char[length2+1];
+	for (unsigned int i=0;i<length2;i++)
+	{
+		m_data[i]=ch;
+	}
+	m_data[length2]='\0';
+	//return *this;
+}
+MyString::MyString(int number)
+{//在这里可以调用系统函数itoa()
+	char Buffe[20];//因为INT数本身的范围限制
+	//方法一
+	//itoa(number,Buffe,10);
+	int temp;
+	temp=number;
+	if (number<0)
+	{
+		number=-number;
+	}
+	int length3=0;
+	while (number>0)//转换
+	{
+		Buffe[length3++]=(char)('0'+number%10);
+		number=number/10;
+	}
+	//判断是否为负
+	if (temp<0)
+	{
+		Buffe[length3++]='-';
+	}
+	char ch=0;
+	Buffe[length3]='\0';
+	strLength=length3;
+	m_data=new char[strLength+1];
+	strcpy(m_data,Buffe);
+	for (int i=0,j=length3-1;i<j;i++,j--)
+	{
+		ch=m_data[i];
+		m_data[i]=m_data[j];
+		m_data[j]=ch;
+	}	
+}
+MyString::~MyString()
+{
+	delete m_data;
 }
 MyString::MyString(const MyString& str)//注意验证是否为空
 {
@@ -55,7 +111,8 @@ MyString::MyString(const MyString& str)//注意验证是否为空
 }
 size_t MyString::sizeStr()
 {
-	return strlen(m_data);
+	strLength=strlen(m_data);
+	return strLength;
 }
 MyString& MyString::operator=(const MyString& obj)
 {
@@ -78,6 +135,7 @@ MyString& MyString::operator=(const MyString& obj)
 std::ostream& operator<<(std::ostream& os,const MyString& rhs)
 {
 	os<<rhs.m_data;
+	return os;
 }
 std::istream& operator>>(std::istream& is,MyString& lhs)
 {//应该捕捉一个异常,并且不控制格式化
@@ -89,23 +147,38 @@ std::istream& operator>>(std::istream& is,MyString& lhs)
 	{
 		lhs=MyString();//空构造函数初始化
 	}
+	return is;
 }
+/*istream& operator>>(istream& in, MyString &obj) //输入流
+{
+	char tmp[1024 * 10];
+	memset(tmp, 0, sizeof(tmp));
+	in >> tmp;
+	if (obj.m_ptr != NULL)
+	{
+		delete[] obj.m_ptr;
+		obj.m_ptr = NULL;
+	}
+	obj.m_ptr = new char[strlen(tmp) + 1];
+	strcpy(obj.m_ptr, tmp);
+	return in;
+}*/
 MyString& MyString::operator+=(const MyString& obj2)
 {
 	char* tempt;
 	tempt=m_data;
 
-	if (m_data!=nullptr)
+	if (m_data==nullptr)
 	{
 		delete m_data;
 		m_data=nullptr;
 	}
 	int length1=strlen(obj2.m_data)+strlen(tempt);
 	m_data=new char[length1+1];
-	memset(m_data,0,sizeof(length1));
-	//strcpy(m_data,obj2.m_data);
+	//memset(m_data,0,sizeof(length1));
+	strcpy(m_data,tempt);
 	strcat(m_data,obj2.m_data);
-	delete tempt;
+	//delete tempt;
 	return *this;
 }
 MyString operator+(MyString& lhs,const MyString& rhs)
@@ -138,4 +211,113 @@ bool operator==(const MyString& lhs,const MyString& rhs)
 bool operator!=(const MyString& lhs,const MyString& rhs)
 {
 	return !(lhs==rhs);
+}
+/*MyString& MyString::operator++()//数据类型不匹配，没办法写
+{
+
+}*/
+char& MyString::operator[](int index)//要考虑到越界的可能性，index大于字符串长度
+{
+	
+	if (m_data==nullptr)
+	{
+		std::cout<<"为空";
+		exit(1);
+
+	}
+	if (index>(size_t)this->sizeStr()||index<0)
+	{
+		std::cout<<"yuejie";
+		exit(1);
+	}
+	if (index<(size_t)this->sizeStr())
+	{
+		return m_data[index];
+	}
+	exit(1);
+}
+const char& MyString::operator[](int index)const
+{
+	if (m_data==nullptr)
+	{
+		std::cout<<"为空";
+		exit(1);
+
+	}
+	if (index>strLength||index<0)
+	{
+		std::cout<<"yuejie";
+		exit(1);
+	}
+	if (index<strLength)
+	{
+		return m_data[index];
+	}
+	exit(1);
+
+}
+int MyString::myfind(char ch)const
+{
+	//unsigned int strLength=this->sizeStr();
+	for (unsigned int i=0;i<strLength;i++)
+	{
+		if (ch==m_data[i])
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+MyString MyString::operator()(int index,int length)//理解不深, 复制
+{
+	if (index<0||index>strLength||index+length>strLength)
+	{
+		std::cout<<"\nOut of range in function call operator. Terminating program"<<std::endl;
+	}
+	char* pSubStr=new char[length+1];
+	for (int i=0;i<length;i++)
+	{
+		pSubStr[i]=m_data[i+index];
+	}
+	pSubStr[length]='\0';
+	MyString tempStr(pSubStr);
+	delete pSubStr；
+	return tempStr；
+}
+
+
+
+//main.cpp
+#include "stdafx.h"
+#include "MyString.h"
+
+using namespace std;
+int _tmain(int argc, _TCHAR* argv[])
+{
+	char*p="Hello word";
+	MyString my(p);
+	
+	MyString mys("songyang");
+	MyString yours("songyang");
+	if (mys==yours)
+	{
+		cout<<"equal"<<endl;
+	}
+	MyString myself=yours;
+    cout<<"fuzhi"<<myself<<endl;
+	mys+=my;
+	cout<<mys<<endl;
+	//MyString lianjie=myself+my;
+	//cout<<lianjie<<endl;//有问题？？？
+	MyString item=mys;
+	int a=mys.sizeStr();
+	cout<<my.myfind('e')<<endl;
+	cout<<a<<endl;
+	const char x=my[4];
+	cout<<my[4]<<endl;
+	MyString zhuan(45755);
+	cout<<zhuan<<endl;
+	cout<<zhuan[2]<<endl;
+
+	return 0;
 }
