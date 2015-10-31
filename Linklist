@@ -1,0 +1,343 @@
+#pragma once
+typedef int T;
+#include <iostream>
+struct Node {
+	 T data;
+	Node* next;
+	Node(const T &a):data(a),next(nullptr){}
+};
+void ShowList(Node* head)
+{
+	Node *p = head;
+	while (p!= NULL)
+	{
+		std::cout << p->data;
+		std::cout << std::endl;
+		std::cout << p->next;
+		std::cout << std::endl;
+		p = p->next;
+	}
+}
+class LinkList
+{
+public:
+	LinkList();
+	~LinkList();
+	void PushFront(const T& p);
+	void Travel()const
+	{
+		Node* p = head;
+		while (p!=nullptr)
+		{
+			std::cout<< p->data << " ";
+			p = p->next;
+		}
+	}
+	void PushFront(Node& p) {//思考关于const，要改变地址，这个不能用const
+		Node* q = new Node(p);//关于用Node来初始化
+		//Node* q = &p;
+		q->next = head;
+		//q = head;
+		head = q;
+		++len;
+	}
+	void Insert(const T& d, int pos);
+	Node*& Getptr(int pos);
+	int Size()const
+	{
+		return len;
+	}
+	int find(const T& d);
+	void erase(int pos);
+	void remove(const T &d);
+	void set(const T&, int);
+	bool empty() const
+	{
+		return len==0;
+		//head==nullptr;
+	}
+	T Front()const
+	{
+		if (empty())throw "kong";
+		   return head->data;
+	}
+	T Back()const
+	{
+		if (empty())throw "kong";
+		Node* p = head;
+		while (p->next != nullptr)
+			p = p->next;
+		return p->data;
+	}
+	void MsortList();
+	void InsertSort();
+	void InsertSort2();
+	void ReserveN();
+private:
+	Node* head;//头指针
+	int len;
+};
+
+LinkList::LinkList():head(nullptr),len(0)
+{
+	//head = nullptr;
+}
+
+LinkList::~LinkList()//注意
+{
+	//Node* q = head;head 就是一个指向node节点的指针，何必再定义一个呢
+	while (head!= nullptr)
+	{
+		Node* temp = head->next;
+		delete head;
+	    head = temp;
+	}
+	
+}
+void LinkList::PushFront(const T& p)
+{
+	/*Node* temp = new Node(p);
+	//(*temp).next = head;
+	temp->next = head;
+	head = temp;*/
+	Insert(p, 0);
+}
+Node*& LinkList::Getptr(int pos){//
+	if (pos<0 || pos>Size())
+		pos = 0;
+	Node* p = head;
+	if (pos==0)
+	{
+		//return (*p).next;
+		return head;
+	}
+	for (int i = 1;i<pos; i++)
+	{
+		p = p->next;
+	}
+	return (*p).next;//原来第几个元素的后面
+}
+void LinkList::Insert(const T& d, int pos) {//在第pos的位置上插入节点，就是找到其前面的节点
+	Node*& pn = Getptr(pos);
+	Node* q = new Node(d);
+	q->next = pn;
+	pn = q;
+	++len;
+}
+int LinkList::find(const T& d)
+{
+	int pos = 0;
+	Node* p = head;//head里面沒值
+	//删除第一个，后面相同的不能删除
+	/*while (p)
+	{
+		if (p->data!=d)
+		{
+			++pos;
+			p = p->next;
+		}
+		return pos;
+	}*/
+	while (p!=nullptr)
+	{
+		if (p->data==d)
+		{
+			return pos;
+		}
+		++pos;
+		p = p->next;
+	}
+	return -1;
+}
+void LinkList::erase(int pos)
+{
+	if (pos<0 || pos>Size())
+		throw "bu cunzai";
+	Node*& pn = Getptr(pos);
+	Node *q = pn;
+	pn = pn->next;
+	delete q;//释放p指向的被越过的那个节点
+	--len;
+}
+void LinkList::remove(const T& d)
+{
+	while(find(d)!=-1)
+	{
+		erase(find(d));
+	}
+}
+void LinkList::set(const T &d, int pos)
+{
+	if (pos<0 || pos>Size())//健壮
+		throw "位置不存在";
+	Getptr(pos)->data = d;
+}
+
+inline void LinkList::MsortList()//冒泡排序
+{
+	Node* p = head;
+	Node* q;
+	int temp;
+	for (; p!=nullptr;p=p->next)
+	{
+		for (q=head; q->next!= nullptr;q=q->next)
+		{
+			if (q->data>q->next->data)
+			{
+				temp = q->data;
+				q->data = q->next->data;
+				q->next->data = temp;
+			}
+		}
+	}
+}
+
+inline void LinkList::InsertSort()
+{
+	
+	Node* q=nullptr, *s, *r;
+	Node* p=nullptr;
+	if (!head->next || !head->next->next)
+		throw "只有一个节点或者为空";
+	r = head->next;
+	head->next = nullptr;
+	while (r != nullptr)
+	{
+		for (q = head, s = r; (q != nullptr&&q->data < s->data); p = q, q = q->next);
+		r = r->next;
+		if (q == head) //插在第一个节点之前
+		{
+			head = s;
+		}
+		else //p是q的前驱
+		{
+			p->next = s;
+		}
+		s->next = q; //完成插入动作*/
+					 /*first = first->next;*/
+	}
+	
+}
+inline void LinkList::InsertSort2()
+{
+
+	Node* q = nullptr, *s, *r;
+	Node* p = nullptr;
+	if (!head->next || !head->next->next)
+		throw "只有一个节点或者为空";
+	r = head->next;
+	head->next = nullptr;
+	while (r != nullptr)
+	{
+		//for (q = head, s = r; (q != nullptr&&q->data < s->data); p = q, q = q->next);
+		q = head;
+		s = r;
+		while (q!=nullptr&&q->data>=s->data)
+		{
+			p = q; 
+			q = q->next;
+		}
+		r = r->next;
+		if (q == head) //插在第一个节点之前
+		{
+			head = s;
+		}
+		else //p是q的前驱
+		{
+			p->next = s;
+		}
+		s->next = q; //完成插入动作*/
+					 /*first = first->next;*/
+	}
+
+}
+
+inline void LinkList::ReserveN()
+{
+	Node* p, *q;
+	p = head->next;
+	head->next = nullptr;
+	while (p)
+	{
+		q = p;
+		p = p->next;
+		q->next = head;
+		head = q;
+		//p = p->next;
+
+	}
+}
+//.........................................................
+//.cpp
+// LinkList.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include "LinkList.h"
+
+using namespace std;
+int main()
+{
+	/*Node a;
+	a.data = 10;
+	a.next = NULL;*/
+	/*Node a = { 10,NULL };
+	Node b = { 20,NULL };
+	Node c = { 30,NULL };
+	Node d = { 40,NULL };
+	Node e = { 50,NULL };
+	Node f = { 60,NULL };
+	a.next = &b;
+	b.next = &c;
+	c.next = &d;
+	d.next = &e;
+	//ShowList(&a);
+	f.next = b.next;//&c;
+	b.next = &f;
+	//ShowList(&a);
+	//int *a = (int*)12300;
+	Node* k = new Node;
+	*k = { 71,NULL };
+	cout<< k << endl;
+	k->next = a.next;
+	a.next =k;
+	ShowList(&a);
+	delete k;*/
+	LinkList l;
+	Node a(40),b(50);
+	l.PushFront(a);
+	l.PushFront(b);//不考虑是节点类型
+	l.PushFront(10);
+	l.PushFront(20);
+	l.PushFront(30);
+	//l.PushFront(a);
+	l.PushFront(101);
+	l.Insert(300, 111);
+	l.Insert(111, 2);
+	l.Insert(111, 4);
+	l.Insert(111, 6);
+	l.Travel();
+	cout <<std::endl;
+	cout << l.Size() <<std::endl;
+	//l.erase(1);
+	l.remove(111);
+	l.Travel();
+	cout << endl;
+	cout << l.Size() << endl;
+	l.set(222, 2);
+	cout<<l.Back()<<endl;
+	cout<<l.Front()<<endl;
+
+	//l.MsortList();
+	//l.InsertSort();
+	//l.Travel();
+	l.InsertSort2();
+	l.Travel();
+	cout << endl;
+	l.ReserveN();
+	l.Travel();
+    return 0;
+	
+}
+
