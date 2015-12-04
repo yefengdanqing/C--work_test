@@ -1,0 +1,216 @@
+//...............Quote.h............
+#pragma once
+#ifndef QUOTE_H
+#define QUOTE_H
+#include <string>
+class Quote
+{
+	friend double PrintPrice(std::ostream os, Quote& item, std::size_t sz);
+public:
+	Quote()=default;
+	Quote(const std::string&, double);
+	virtual ~Quote()=default;
+	Quote(const Quote&);
+	Quote(const Quote&& other):bookno_(other.bookno_),price_(other.price_){}//
+	std::string Isbn()const;
+	virtual double NetPrice(std::size_t n)const;
+	//double PrintTotal(std::ostream& os, const Quote& item, std::size_t n);//基类的引用，导致多态性
+	void Function();
+	//因为有拷贝对象和移动对象，定义两个版本
+	virtual Quote* Clone()const &   { return new Quote(*this); }
+	virtual Quote* Clone()&&  {return new Quote(std::move(*this)); }
+
+private:
+	std::string bookno_;//
+protected:
+	double price_;
+};
+#endif
+//.....................Quote.cpp.....................
+#include "stdafx.h"
+#include "Quote.h"
+#include <iostream>
+using std::string;
+Quote::Quote(const string& book,double saleprice):bookno_(book),price_(saleprice)
+{}
+Quote::Quote(const Quote& other):bookno_(other.bookno_),price_(other.price_)
+{
+}
+string Quote::Isbn()const //也被继承
+{
+	return this->bookno_;
+}
+
+double Quote::NetPrice(std::size_t n) const
+{
+	std::cout << "父类或者基类" << std::endl;
+	return n*price_;
+}
+
+void Quote::Function()
+{
+	std::cout << "father" << std::endl;
+}
+//.......................DiscountSale.h..................
+#pragma once
+#include "Quote.h"
+class DiscountQuote:public Quote {
+public:
+	DiscountQuote() = default;//既需要默认构造函数，也需要其他构造函数
+	DiscountQuote(const std::string& book,double price,double potmath,std::size_t n)
+		:Quote(book,price),discount_(potmath),minimumquantify_(n){}
+	virtual double NetPrice(std::size_t n)const = 0;
+	~DiscountQuote(){}
+protected:
+	double discount_;
+	std::size_t minimumquantify_;
+};
+//....................BulkQuot.h......................
+#pragma once
+#include "Quote.h"
+class DiscountQuote:public Quote {
+public:
+	DiscountQuote() = default;//既需要默认构造函数，也需要其他构造函数
+	DiscountQuote(const std::string& book,double price,double potmath,std::size_t n)
+		:Quote(book,price),discount_(potmath),minimumquantify_(n){}
+	virtual double NetPrice(std::size_t n)const = 0;
+	~DiscountQuote(){}
+protected:
+	double discount_;
+	std::size_t minimumquantify_;
+};
+//.....................BulkQuote.cpp........................
+#include "stdafx.h"
+#include <iostream>
+#include "BulkQuote.h"
+
+//BulkQuote::BulkQuote(){}
+BulkQuote::BulkQuote(const std::string &book, double saleprice, double minimumprice, std::size_t number)
+	:DiscountQuote(book, saleprice,minimumprice,number)
+{
+}
+
+double BulkQuote::NetPrice(std::size_t cnt) const
+{
+	std::cout << "子类或者派生类" << std::endl;
+	if (cnt >= minimumquantify_)
+
+		return cnt*price_*(1 - discount_);
+	else
+		return cnt*price_;//price_是受保护的成员，可被派生类访问
+}
+
+int BulkQuote::SpeciesDiversity(std::string book)
+{
+	return 0;
+}
+
+void BulkQuote::Function()
+{
+	BulkQuote text;
+	this->Transform(text);//实现了派生类到基类的转化
+	std::cout << "son" << std::endl;
+}
+
+void BulkQuote::Transform(Quote &)
+{
+
+	std::cout << "transform derived" << std::endl;
+}
+
+BulkQuote::~BulkQuote()
+{
+}
+//..............................basket.h...................
+#pragma once
+#include "BulkQuote.h"//basket的对象必须处理动态内存
+#include <memory>
+#include <set>
+double PrintTotal(std::ostream& os, const Quote& item, std::size_t n)
+{
+	double ret = item.NetPrice(n);//多态的调用
+	os << "shuhao:" << item.Isbn() << "***sold" << n << "total fee:" << ret << std::endl;
+	return ret;
+}
+class Basket
+{
+public:
+	void AddIteam(const Quote& sale) ////添加函数添加基类还是派生类，存为智能指针类型，指向基类(动态绑定）
+	{
+		item_.insert(std::shared_ptr<Quote>(sale.Clone()));
+	}
+	void AddIteam(Quote&& sale)
+	{
+		item_.insert(std::shared_ptr<Quote>(std::move(sale).Clone()));//猜move的返回类型一定是一个引用
+	}
+	double TotalReceipt(std::ostream& os)const
+	{
+		double sum=0.0;
+		
+		for (auto iter = item_.cbegin(); iter != item_.cend(); iter=item_.upper_bound(*iter))
+		{
+			sum += PrintTotal(os, **iter,item_.count(*iter));
+		}
+		os << "TatolSale:" << sum << std::endl;
+		return sum;
+	}
+private:
+	static bool compare(const std::shared_ptr<Quote> rhs, const std::shared_ptr<Quote> lhs)
+	{
+		return (*rhs).Isbn() < lhs->Isbn();
+	}
+	//可重复无序的set
+	std::multiset<std::shared_ptr<Quote>, decltype(compare)*> item_{ compare };//这个类型怎么定义的
+};
+//...............................QuoteInherit.cpp..............
+// Quote.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include "BulkQuote.h"
+#include <vector>
+#include "Basket.h"
+
+
+int main()
+{
+	Quote basic;
+	BulkQuote bulk;
+	BulkQuote test;
+	bulk.Function();
+	Quote base("0-201-8247-1", 50);
+	//base.NetPrice(10);//类型已经确定
+
+	Quote* p = new Quote;
+	(*p).NetPrice(10);
+	BulkQuote* q = new BulkQuote;
+
+	//p = &bulk;//隐式转换
+	(*p).NetPrice(10);//因为是指针调用虚函数，所以是动态绑定
+	//q = &basic;
+	//PrintTotal(std::cout, *p, 3);
+	//bulk.Transform(test);//用户无法访问
+	std::cout << "-----------------------容器与继承--------------" << std::endl;
+	/*std::vector<Quote> basket;
+	basket.push_back(Quote("0-19901010", 34.5));
+	basket.push_back(Quote("0-19891010", 44.3));
+	basket.push_back(BulkQuote("0-19891010", 44.3, .15, 20));
+	std::cout << basket.back().NetPrice(10) << std::endl;*/
+	/*std::vector<std::shared_ptr<Quote>> basket;
+	basket.push_back(std::make_shared<Quote>("0-19901010", 34.5));
+	basket.push_back(std::make_shared<Quote>("0-19891010", 44.3));
+	basket.push_back(std::make_shared<BulkQuote>("0 - 19891010", 44.3, .15, 15));
+	std::cout << basket.back()->NetPrice(10) << std::endl;*/
+	Quote object("0-19901010", 34.5);
+	Quote object1("0-19891010", 44.3);
+	BulkQuote object3("1-19891010", 44.3, .15, 10);
+	Basket salescar;
+	salescar.AddIteam(object);
+	salescar.AddIteam(BulkQuote("1-19901010", 34.5,0.2,10));
+	salescar.AddIteam(object1);
+	salescar.AddIteam(object3);
+	salescar.TotalReceipt(std::cout);
+
+	return 0;
+}
