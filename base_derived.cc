@@ -56,6 +56,7 @@ int main()
 	pb->print_base();
 	pb->func();
 	//Base* pd =dynamic_cast<Base*>(pb);
+	//学到了基类和派生类指针转换方法dynamic_cast：如果基类指针确实是指向了一个派生类对象，此运算符会传回转换后的派生类指针，否则，返回空指针。
 	//Derive* pd=dynamic_cast<Derive*>(pb);//段错误
 	Derive* pd=(Derive*)(pb);//不安全
 	pd->print_base();//由调用对象的静态类型（声明类型）决定调用那个非虚函数
