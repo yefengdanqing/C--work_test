@@ -14,7 +14,7 @@ public:
 	{
 		cout<<"virtual base"<<endl;
 	}
-	//有多态实现和共有继承，定义为虚函数
+	//有多态实现和公有继承，定义为虚函数
 	~Base()
 	{
 		cout<<"xigou_base"<<endl;
