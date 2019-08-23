@@ -12,6 +12,8 @@ add1(T a, T b) -> decltype(a)
 int main()
 {
     auto func = add;
-    auto a = add1(2,2);
-    cout << func(1,2) <<endl;
+    auto a = func(2,2);
+    auto res = add1(4,4);
+    cout << res <<endl;
 }
+
