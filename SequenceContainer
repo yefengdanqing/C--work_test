@@ -1,0 +1,117 @@
+// Container.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include<vector>
+#include<list>
+#include<deque>
+#include<forward_list>
+#include<string>
+#include<iterator>
+using namespace std;
+
+
+int main()
+{
+	std::vector<std::string> v(20,"always123");
+	/*for (size_t i = 0; i < v.size(); i++)
+	{
+		cout << v[i] << endl;
+	}*/
+	list<string> sList = { "dota2"," ","game" };
+	//list<string>::iterator  itor = sList.begin();
+	sList.insert(sList.begin(), "play");
+	sList.push_front("play");
+	//sList.insert(sList.begin(), v.begin(), (v.begin() + 2));
+	
+	sList.insert(sList.cbegin(), { "I", "like" });
+	sList.insert(sList.begin(), 5, "nvwang");
+	sList.insert(sList.begin(), v.cbegin(), (v.cbegin() + 2));
+	auto itor = sList.begin();
+	//list<string>::iterator  itor = sList.begin();
+	while (itor != sList.end())
+	{
+		cout << (*itor )<< endl;
+		itor++;
+	}
+	cout << sList.size() << endl;
+	auto it1= sList.insert(sList.cbegin(), { "I", "like" });
+	//cout << it1;
+	list<string> vList;
+	vector<string> vs = {"renmen","qunaer","ssdddf","scar"};
+	vList.insert(vList.begin(), vs.begin(),(vs.begin()+1));
+	auto iter = vList.begin();
+	string words;
+	while (cin>> words)
+	{
+		iter = vList.insert(iter, words);
+
+	}
+	//auto itorv= vList.begin();
+	//list<string>::iterator  itor = sList.begin();
+	vList.emplace_back("and lion");
+	vList.emplace_front("torrower");
+	auto itorv = vList.begin();
+	while (itorv!= vList.end())
+	{
+		cout << (*itorv) << endl;
+		itorv++;
+	}
+	if (vList.empty())
+	{
+		auto val = *vList.begin();
+		auto val1= vList.front();
+		auto val2 = *(--vList.end());
+		auto val3 = vList.back();
+	}
+	forward_list<int> flint = { 0,1,2,3,4,5,6,7,8,9 };
+	auto prev = flint.before_begin();
+	auto curr = flint.begin();
+	while (curr != flint.end())
+	{
+		if (*curr % 2)
+		{
+			curr=flint.erase_after(prev);
+		}
+		else
+		{
+			prev = curr;
+			curr++;
+		}
+
+	}
+
+	//string 
+	string s = "dazhuzai mucheng";
+	s.insert(s.begin(),'t');
+	//string sq = { 't','d','o','u' };
+	s.insert(s.end(), { 't','d','o','u' });
+	s.insert(s.end(), 3, 's');
+
+
+	string name("annebelle");
+	auto pos = name.find("anne");
+	auto pos1 = name.find("belle");
+	string number("0123456789");
+	string name1("song123ka1");
+	auto pos2 = name1.find_first_of(number);
+	auto pos2x= name1.find_last_of(number);
+	string name2("t2o567t");
+	auto pos3 = name2.find_first_not_of(number);
+	auto pos4 = name2.find_last_not_of(number,1);//why is 0
+	auto pos5 = name.rfind("nebe");//查找从右向左，输出还是从左向右的下标
+	cout<<name.compare(name2)<<endl;
+
+	string::size_type pos6 = 0;
+		while ((pos6 = name2.find_first_of(number, pos6)) != string::npos)
+		{
+			cout << "xiabiao:"<<pos6<<endl;
+			cout << " shuzhi "<<name2[pos6]<<endl;
+			++pos6;
+		}
+
+
+	return 0;
+}
+

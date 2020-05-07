@@ -1,0 +1,82 @@
+#include "stdafx.h"
+#include "MyString.h"
+#include <stdio.h>
+#include <cstring>
+#include <iostream>
+
+using namespace std;
+MyString::MyString(const char* str)
+{
+	cout<<"构造函数被调用"<<endl;
+	if (str==nullptr)
+	{
+		m_data=new char[1];
+		*m_data='\0';
+	}
+	else
+	{
+		int length=strlen(str);
+		m_data=new char[length+1];
+		strcpy(m_data,str);
+		cout<<*str<<endl;
+	}
+}
+MyString::~MyString()
+{
+   delete m_data;
+   cout<<"xi gou "<<endl;
+}
+MyString::MyString(const MyString& strobj)
+{
+	int length=strlen(strobj.m_data);
+	if (m_data==nullptr)
+	{
+		delete m_data;
+	}
+	m_data=new char[length+1];
+	strcpy(m_data,strobj.m_data);
+	//std::cout<<strobj;
+}
+MyString& MyString::operator= (const MyString& strobj)
+{
+	if (this==&strobj)
+	{
+		return *this;
+		//return strobj;
+	}
+	delete m_data;
+	int length=strlen(strobj.m_data );
+	if (m_data!=nullptr)
+	{
+		delete m_data;
+	}
+	m_data=new char[length+1];
+	strcpy(m_data,strobj.m_data);
+}
+size_t MyString::sizeStr() const
+{
+	return strlen(m_data);
+}
+void MyString::swapString(MyString& rhl)
+{
+	std::swap(m_data,rhl.m_data);
+}
+
+/*istream& operator>>(istream& is,const MyString& strobj)
+{
+	//return strobj.printf(is);
+	is>>strobj.m_data;
+}*/
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	char*p="Hello word";
+	MyString my(p);
+	
+	MyString mys(my);
+	MyString item=mys;
+	int a=mys.sizeStr();
+	//cout<<item;
+
+	return 0;
+}
